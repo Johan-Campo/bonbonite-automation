@@ -4,6 +4,7 @@ import { Ensure } from '@serenity-js/assertions';
 import { Click, Enter, Navigate, isVisible } from '@serenity-js/web';
 
 import { MensajeDeConfirmacion } from '../support/screenplay/questions/MensajeDeConfirmacion.js';
+import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
 import { MiCuenta } from '../support/screenplay/ui/miCuenta.js';
 import { Registrarse, datosDeRegistroUnicos } from '../support/screenplay/tasks/Registrarse.js';
 import type { DatosDeRegistro } from '../support/screenplay/tasks/Registrarse.js';
@@ -13,7 +14,7 @@ import type { DatosDeRegistro } from '../support/screenplay/tasks/Registrarse.js
 const datosRegistradosPorActor = new Map<string, DatosDeRegistro>();
 
 Given('que {word} visita la página de "Mi cuenta" de Bon-bonite', async (nombreActor: string) => {
-  await actorCalled(nombreActor).attemptsTo(Navigate.to('/mi-cuenta/'));
+  await actorCalled(nombreActor).attemptsTo(Navigate.to('/mi-cuenta/'), AceptarCookiesSiAparecen());
 });
 
 When(
@@ -44,6 +45,7 @@ Given('que {word} ha iniciado sesión con una cuenta previamente registrada', as
 
   await actorCalled(nombreActor).attemptsTo(
     Navigate.to('/mi-cuenta/'),
+    AceptarCookiesSiAparecen(),
     Registrarse(datos),
   );
 });
