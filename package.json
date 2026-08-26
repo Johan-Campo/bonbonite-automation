@@ -1,0 +1,26 @@
+{
+  "name": "bonbonite-automation",
+  "version": "1.0.0",
+  "description": "Automatización E2E con Serenity/JS (patrón Screenplay) para bon-bonite.com",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cucumber-js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^13.2.1",
+    "@serenity-js/assertions": "^3.45.9",
+    "@serenity-js/console-reporter": "^3.45.9",
+    "@serenity-js/core": "^3.45.9",
+    "@serenity-js/cucumber": "^3.45.9",
+    "@serenity-js/playwright": "^3.45.9",
+    "@serenity-js/web": "^3.45.9",
+    "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.3.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  }
+}

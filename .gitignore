@@ -1,0 +1,5 @@
+PRUEBA_TECNICA_GUIA.md
+node_modules/
+target/
+.serenity/
+*.tsbuildinfo
