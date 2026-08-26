@@ -1,30 +1,60 @@
 import { Given, Then, When } from '@cucumber/cucumber';
+import { actorCalled, actorInTheSpotlight } from '@serenity-js/core';
+import { Ensure, includes } from '@serenity-js/assertions';
+import { Navigate } from '@serenity-js/web';
 
-// Checkout/pago real queda fuera de alcance de esta iteración (no se debe procesar un
-// pago real contra producción). Estos steps existen para que el escenario cargue y
-// falle de forma explícita, nunca en falso, hasta que se implemente el flujo completo
-// con los locators de features/support/screenplay/ui/producto.ts.
+import { ContenidoDelCarrito } from '../support/screenplay/questions/ContenidoDelCarrito.js';
+import { TituloDelProducto } from '../support/screenplay/questions/TituloDelProducto.js';
+import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
+import { AgregarAlCarrito } from '../support/screenplay/tasks/AgregarAlCarrito.js';
+import { ElegirTallaDisponible } from '../support/screenplay/tasks/ElegirTallaDisponible.js';
+import { SeleccionarPrimerProductoDelListado } from '../support/screenplay/tasks/SeleccionarPrimerProductoDelListado.js';
 
-const pendienteDeImplementar = (paso: string): never => {
-  throw new Error(`Pendiente de implementar: ${paso}`);
+// URLs verificadas contra el sitio real; "Outlet" no lleva el sufijo "-mujer" que sí
+// llevan las demás categorías.
+const URL_MODULOS: Record<string, string> = {
+  Zapatos: '/categoria-producto/zapatos-mujer/',
+  Bolsos: '/categoria-producto/bolsos-mujer/',
+  Cinturones: '/categoria-producto/cinturones-mujer/',
+  Accesorios: '/categoria-producto/accesorios-mujer/',
+  Outlet: '/categoria-producto/outlet/',
 };
 
-Given('que {word} navega al módulo "Zapatos"', () => {
-  pendienteDeImplementar('navegar al módulo "Zapatos"');
+// Guarda, por nombre de actor, el título del producto seleccionado para poder
+// verificar después que el carrito realmente lo refleja.
+const productoSeleccionadoPorActor = new Map<string, string>();
+
+Given('que {word} navega al módulo {string}', async (nombreActor: string, modulo: string) => {
+  const ruta = URL_MODULOS[modulo];
+  if (!ruta) {
+    throw new Error(`Módulo "${modulo}" no tiene una URL configurada en URL_MODULOS.`);
+  }
+
+  await actorCalled(nombreActor).attemptsTo(Navigate.to(ruta), AceptarCookiesSiAparecen());
 });
 
-When('selecciona el primer producto disponible del listado', () => {
-  pendienteDeImplementar('seleccionar el primer producto disponible del listado');
+When('selecciona el primer producto disponible del listado', async () => {
+  const actor = actorInTheSpotlight();
+  await actor.attemptsTo(SeleccionarPrimerProductoDelListado());
+
+  const titulo = await actor.answer(TituloDelProducto());
+  productoSeleccionadoPorActor.set(actor.name, titulo);
 });
 
-When('elige una talla disponible', () => {
-  pendienteDeImplementar('elegir una talla disponible (verificar isEnabled() antes de hacer click)');
+When('elige una talla disponible', async () => {
+  await actorInTheSpotlight().attemptsTo(ElegirTallaDisponible());
 });
 
-When('lo agrega al carrito', () => {
-  pendienteDeImplementar('agregar el producto al carrito');
+When('lo agrega al carrito', async () => {
+  await actorInTheSpotlight().attemptsTo(AgregarAlCarrito());
 });
 
-Then('el carrito refleja el producto agregado', () => {
-  pendienteDeImplementar('verificar que el carrito refleja el producto agregado');
+Then('el carrito refleja el producto agregado', async () => {
+  const actor = actorInTheSpotlight();
+  const titulo = productoSeleccionadoPorActor.get(actor.name);
+  if (!titulo) {
+    throw new Error('No se capturó el título del producto seleccionado en un paso previo.');
+  }
+
+  await actor.attemptsTo(Ensure.that(ContenidoDelCarrito(), includes(titulo)));
 });
