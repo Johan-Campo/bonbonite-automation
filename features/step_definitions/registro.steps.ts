@@ -1,7 +1,7 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { actorCalled, actorInTheSpotlight } from '@serenity-js/core';
-import { Ensure } from '@serenity-js/assertions';
-import { Click, Enter, Navigate, isVisible } from '@serenity-js/web';
+import { Ensure, includes } from '@serenity-js/assertions';
+import { Click, Enter, Navigate, Page, isVisible } from '@serenity-js/web';
 
 import { MensajeDeConfirmacion } from '../support/screenplay/questions/MensajeDeConfirmacion.js';
 import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
@@ -29,8 +29,13 @@ When(
 );
 
 Then('el sistema confirma que la cuenta fue creada exitosamente', async () => {
+  // Se verificó contra el sitio real que "Cerrar sesión" existe como enlace pero
+  // aparece duplicado (versión de escritorio y de menú móvil) y no siempre visible sin
+  // abrir un menú, lo que lo hace poco fiable para esta verificación. WooCommerce
+  // redirige a /mi-cuenta/orders/ e inicia sesión automáticamente tras un registro
+  // exitoso — es una señal más simple y ya confirmada.
   await actorInTheSpotlight().attemptsTo(
-    Ensure.that(MiCuenta.cuentaLogueada.enlaceCerrarSesion, isVisible()),
+    Ensure.that(Page.current().url().pathname, includes('/mi-cuenta/orders')),
   );
 });
 

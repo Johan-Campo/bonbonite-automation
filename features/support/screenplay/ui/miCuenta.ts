@@ -1,85 +1,69 @@
-import type { Answerable } from '@serenity-js/core';
 import { By, PageElement } from '@serenity-js/web';
 
 /**
- * Los campos de texto y correo tienen rol ARIA implícito "textbox", así que el rol
- * accesible + nombre basta para ubicarlos y, de paso, Playwright excluye por defecto
- * los elementos ocultos al resolver por rol — lo que desambigua automáticamente entre
- * el formulario de login y el de registro cuando comparten una etiqueta (ej. "Número
- * de cédula"), ya que solo el formulario visible tras el toggle aparece en el árbol
- * de accesibilidad.
+ * Verificado contra el DOM real de /mi-cuenta/: ninguno de los campos de texto tiene
+ * un <label for="..."> asociado correctamente, así que localizarlos por rol accesible
+ * + nombre (como se había asumido originalmente) no funciona — todas las búsquedas
+ * por rol devolvían 0 resultados. Los campos sí tienen IDs estables y semánticos
+ * (parte del formulario estándar de registro/login de WooCommerce), así que se
+ * localizan por ID.
+ *
+ * El toggle "¿Eres nuevo? Regístrate" tampoco es un <a> (no tiene rol de link): es un
+ * <span id="show_register"> con un manejador de clic en JS.
  */
-const campoDeTexto = (etiqueta: string) =>
-  PageElement.located(By.role('textbox', { name: etiqueta, exact: true }));
-
-/**
- * Los campos de tipo password NO tienen rol ARIA implícito, por lo que no pueden
- * ubicarse con By.role. Se localizan por el texto de su <label> (patrón WooCommerce
- * clásico: el <input> vive anidado dentro del <label>).
- * // TODO: verificar selector real contra el sitio — si bon-bonite usa label[for] + id
- * en vez de anidamiento, este XPath debe ajustarse.
- */
-const campoDeContrasenaDentroDe = (contenedor: Answerable<PageElement>, etiquetaXPath: string) =>
-  PageElement.of(
-    PageElement.located(By.xpath(`.//label[${etiquetaXPath}]/input`)),
-    contenedor,
-  );
-
-const formularioLogin = PageElement.located(By.css('form.woocommerce-form-login')).describedAs(
-  'formulario de inicio de sesión',
-);
-
-const formularioRegistro = PageElement.located(By.css('form.woocommerce-form-register')).describedAs(
-  'formulario de registro',
-);
-
-const xpathSoloContrasena = 'starts-with(normalize-space(.), "Contraseña") and not(contains(., "Confirmar"))';
-const xpathConfirmarContrasena = 'contains(normalize-space(.), "Confirmar contraseña")';
-
 export const MiCuenta = {
-  enlaceRegistrate: PageElement.located(
-    By.role('link', { name: '¿Eres nuevo? Regístrate' }),
-  ).describedAs('enlace "¿Eres nuevo? Regístrate"'),
+  enlaceRegistrate: PageElement.located(By.id('show_register')).describedAs(
+    'enlace "¿Eres nuevo? Regístrate"',
+  ),
 
   login: {
-    campoCedula: campoDeTexto('Número de cédula'),
-    campoContrasena: campoDeContrasenaDentroDe(formularioLogin, xpathSoloContrasena),
+    campoCedula: PageElement.located(By.id('username')).describedAs('campo de cédula (login)'),
+    campoContrasena: PageElement.located(By.id('password')).describedAs(
+      'campo de contraseña (login)',
+    ),
     botonIniciarSesion: PageElement.located(
-      By.role('button', { name: 'INICIAR SESIÓN', exact: true }),
+      By.role('button', { name: 'Iniciar sesión', exact: false }),
     ).describedAs('botón "INICIAR SESIÓN"'),
   },
 
   registro: {
-    campoCedula: campoDeTexto('Número de cédula'),
-    campoNombres: campoDeTexto('Nombres'),
-    campoApellidos: campoDeTexto('Apellidos'),
-    campoCorreo: campoDeTexto('Dirección de correo electrónico'),
-    campoContrasena: campoDeContrasenaDentroDe(formularioRegistro, xpathSoloContrasena),
-    campoConfirmarContrasena: campoDeContrasenaDentroDe(formularioRegistro, xpathConfirmarContrasena),
-    // TODO: verificar selector real contra el sitio — se asume que el texto accesible
-    // del checkbox coincide con el texto visible de su <label>; si hay un enlace anidado
-    // (ej. a la política de datos) el nombre accesible completo podría variar.
-    checkboxNovedades: PageElement.located(
-      By.role('checkbox', {
-        name: 'Quiero recibir información sobre las novedades de bon-bonite en mi e-mail.',
-        exact: false,
-      }),
-    ).describedAs('checkbox de novedades por correo'),
-    checkboxAutorizacionDatos: PageElement.located(
-      By.role('checkbox', { name: 'Autorizo el tratamiento de mis datos personales', exact: false }),
-    ).describedAs('checkbox de autorización de tratamiento de datos'),
+    campoCedula: PageElement.located(By.id('reg_username')).describedAs(
+      'campo de cédula (registro)',
+    ),
+    campoNombres: PageElement.located(By.id('first_name')).describedAs('campo de nombres'),
+    campoApellidos: PageElement.located(By.id('last_name')).describedAs('campo de apellidos'),
+    campoCorreo: PageElement.located(By.id('reg_email')).describedAs(
+      'campo de correo electrónico',
+    ),
+    campoContrasena: PageElement.located(By.id('reg_password')).describedAs(
+      'campo de contraseña (registro)',
+    ),
+    campoConfirmarContrasena: PageElement.located(By.id('reg_password2')).describedAs(
+      'campo de confirmar contraseña',
+    ),
+    checkboxNovedades: PageElement.located(By.id('newsletter_authorization')).describedAs(
+      'checkbox de novedades por correo',
+    ),
+    checkboxAutorizacionDatos: PageElement.located(By.id('privacy_policy_reg')).describedAs(
+      'checkbox de autorización de tratamiento de datos',
+    ),
     botonRegistrarme: PageElement.located(
-      By.role('button', { name: 'REGISTRARME', exact: true }),
+      By.role('button', { name: 'Registrarme', exact: false }),
     ).describedAs('botón "REGISTRARME"'),
   },
 
   cuentaLogueada: {
+    // TODO: verificar selector real contra el sitio — no se completó un registro real
+    // todavía para inspeccionar el DOM de la cuenta ya logueada; se asume el marcador
+    // estándar de WooCommerce.
     enlaceCerrarSesion: PageElement.located(
-      By.role('link', { name: 'Cerrar sesión' }),
-    ).describedAs('enlace "Cerrar sesión" (marcador estándar de WooCommerce de sesión activa)'),
+      By.role('link', { name: 'Cerrar sesión', exact: false }),
+    ).describedAs('enlace "Cerrar sesión"'),
     // TODO: verificar selector real contra el sitio — DOM de "Mi cuenta" > "Editar datos
-    // de la cuenta" no fue inspeccionado; se asume la etiqueta estándar de WooCommerce.
-    campoNombre: campoDeTexto('Nombre'),
+    // de la cuenta" no fue inspeccionado.
+    campoNombre: PageElement.located(By.css('input[name="first_name" i]')).describedAs(
+      'campo "Nombre" en edición de cuenta',
+    ),
     botonGuardarCambios: PageElement.located(
       By.role('button', { name: 'Guardar cambios', exact: false }),
     ).describedAs('botón "Guardar cambios"'),
