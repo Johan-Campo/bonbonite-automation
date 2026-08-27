@@ -5,16 +5,6 @@ export const MiCuenta = {
     'enlace "¿Eres nuevo? Regístrate"',
   ),
 
-  login: {
-    campoCedula: PageElement.located(By.id('username')).describedAs('campo de cédula (login)'),
-    campoContrasena: PageElement.located(By.id('password')).describedAs(
-      'campo de contraseña (login)',
-    ),
-    botonIniciarSesion: PageElement.located(
-      By.role('button', { name: 'Iniciar sesión', exact: false }),
-    ).describedAs('botón "INICIAR SESIÓN"'),
-  },
-
   registro: {
     campoCedula: PageElement.located(By.id('reg_username')).describedAs(
       'campo de cédula (registro)',
@@ -30,9 +20,6 @@ export const MiCuenta = {
     campoConfirmarContrasena: PageElement.located(By.id('reg_password2')).describedAs(
       'campo de confirmar contraseña',
     ),
-    checkboxNovedades: PageElement.located(By.id('newsletter_authorization')).describedAs(
-      'checkbox de novedades por correo',
-    ),
     checkboxAutorizacionDatos: PageElement.located(By.id('privacy_policy_reg')).describedAs(
       'checkbox de autorización de tratamiento de datos',
     ),
@@ -42,9 +29,6 @@ export const MiCuenta = {
   },
 
   cuentaLogueada: {
-    enlaceCerrarSesion: PageElement.located(
-      By.role('link', { name: 'Cerrar sesión', exact: false }),
-    ).describedAs('enlace "Cerrar sesión"'),
     botonActualizarInformacion: PageElement.located(
       By.role('button', { name: 'Actualizar Información', exact: false }),
     ).describedAs('botón "Actualizar Información"'),
