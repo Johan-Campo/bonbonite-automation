@@ -1,15 +1,15 @@
 import { Given, Then, When } from '@cucumber/cucumber';
-import { actorCalled, actorInTheSpotlight } from '@serenity-js/core';
+import { actorCalled, actorInTheSpotlight, Wait } from '@serenity-js/core';
 import { Ensure, includes } from '@serenity-js/assertions';
-import { Click, Enter, Navigate, Page, isVisible } from '@serenity-js/web';
+import { By, Click, Enter, Navigate, Page, PageElement, Text, isVisible } from '@serenity-js/web';
 
-import { MensajeDeConfirmacion } from '../support/screenplay/questions/MensajeDeConfirmacion.js';
 import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
 import { MiCuenta } from '../support/screenplay/ui/miCuenta.js';
 import { Registrarse, datosDeRegistroUnicos } from '../support/screenplay/tasks/Registrarse.js';
 import type { DatosDeRegistro } from '../support/screenplay/tasks/Registrarse.js';
 
 const datosRegistradosPorActor = new Map<string, DatosDeRegistro>();
+const nuevoNombrePorActor = new Map<string, string>();
 
 Given('que {word} visita la página de "Mi cuenta" de Bon-bonite', async (nombreActor: string) => {
   await actorCalled(nombreActor).attemptsTo(Navigate.to('/mi-cuenta/'), AceptarCookiesSiAparecen());
@@ -47,21 +47,30 @@ When('actualiza su nombre desde "Mi cuenta"', async () => {
   const actor = actorInTheSpotlight();
   const datosPrevios = datosRegistradosPorActor.get(actor.name);
   const nuevoNombre = `${datosPrevios?.nombres ?? 'Camila'}Actualizada`;
+  nuevoNombrePorActor.set(actor.name, nuevoNombre);
 
   await actor.attemptsTo(
     Navigate.to('/mi-cuenta/edit-account/'),
+    Click.on(MiCuenta.cuentaLogueada.botonActualizarInformacion),
     Enter.theValue(nuevoNombre).into(MiCuenta.cuentaLogueada.campoNombre),
   );
 });
 
 When('guarda los cambios', async () => {
   await actorInTheSpotlight().attemptsTo(
-    Click.on(MiCuenta.cuentaLogueada.botonGuardarCambios),
+    Click.on(MiCuenta.cuentaLogueada.botonGuardar),
+    Wait.until(MiCuenta.cuentaLogueada.botonActualizarInformacion, isVisible()),
   );
 });
 
 Then('el sistema confirma que los datos fueron actualizados correctamente', async () => {
-  await actorInTheSpotlight().attemptsTo(
-    Ensure.that(MensajeDeConfirmacion.elemento(), isVisible()),
+  const actor = actorInTheSpotlight();
+  const nuevoNombre = nuevoNombrePorActor.get(actor.name);
+  if (!nuevoNombre) {
+    throw new Error('No se capturó el nuevo nombre en un paso previo.');
+  }
+
+  await actor.attemptsTo(
+    Ensure.that(Text.of(PageElement.located(By.css('body'))), includes(nuevoNombre)),
   );
 });

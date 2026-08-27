@@ -45,11 +45,14 @@ export const MiCuenta = {
     enlaceCerrarSesion: PageElement.located(
       By.role('link', { name: 'Cerrar sesión', exact: false }),
     ).describedAs('enlace "Cerrar sesión"'),
-    campoNombre: PageElement.located(By.id('first_name')).describedAs(
+    botonActualizarInformacion: PageElement.located(
+      By.role('button', { name: 'Actualizar Información', exact: false }),
+    ).describedAs('botón "Actualizar Información"'),
+    campoNombre: PageElement.located(By.css('input[name="first_name"]')).describedAs(
       'campo "Nombre" en edición de cuenta',
     ),
-    botonGuardarCambios: PageElement.located(
-      By.role('button', { name: 'Guardar cambios', exact: false }),
-    ).describedAs('botón "Guardar cambios"'),
+    botonGuardar: PageElement.located(
+      By.role('button', { name: 'Guardar', exact: true }),
+    ).describedAs('botón "Guardar"'),
   },
 };
