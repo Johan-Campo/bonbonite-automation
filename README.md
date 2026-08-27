@@ -1,49 +1,107 @@
 # bonbonite-automation
 
-Automatización E2E con **Serenity/JS** (patrón Screenplay) sobre Playwright y Cucumber.js, contra el sitio real [bon-bonite.com](https://www.bon-bonite.com/).
+Automatización de pruebas end-to-end para el sitio [bon-bonite.com](https://www.bon-bonite.com/), usando el patrón **Screenplay** de Serenity/JS.
 
-## Instalación
+## Stack tecnológico
+
+| Herramienta | Para qué se usa |
+|---|---|
+| **TypeScript** | Lenguaje en el que está escrito todo el código de automatización |
+| **Serenity/JS** | Framework de automatización con el patrón Screenplay (Actor, Task, Question) |
+| **Playwright** | Motor que controla el navegador real (Chromium) |
+| **Cucumber.js** | Permite escribir los escenarios de prueba en español, en lenguaje natural |
+| **ESLint** | Revisa la calidad y consistencia del código |
+| **Serenity BDD** | Genera el reporte HTML final con capturas de pantalla como evidencia (requiere Java, ver más abajo) |
+
+## Cómo ejecutar el proyecto
+
+Esta guía asume que no tienes nada instalado todavía. Sigue los pasos en orden.
+
+### 1. Instalar Node.js
+
+Node.js es el programa que permite ejecutar este proyecto.
+
+1. Entra a [nodejs.org](https://nodejs.org/) y descarga la versión **LTS** (la recomendada).
+2. Instálalo como cualquier programa (siguiente, siguiente, finalizar).
+3. Para confirmar que quedó instalado, abre una terminal (en Windows: busca "cmd" o "PowerShell" en el menú de inicio; en Mac: busca "Terminal") y escribe:
+
+   ```bash
+   node -v
+   ```
+
+   Si ves un número de versión (por ejemplo `v24.18.1`), quedó instalado correctamente.
+
+### 2. Descargar el proyecto
+
+Si tienes Git instalado, en la terminal escribe:
+
+```bash
+git clone https://github.com/Johan-Campo/bonbonite-automation.git
+cd bonbonite-automation
+```
+
+Si no tienes Git, puedes descargar el proyecto como archivo ZIP desde GitHub (botón verde "Code" → "Download ZIP") y descomprimirlo en tu computador. Luego, en la terminal, entra a esa carpeta con `cd` seguido de la ruta donde la descomprimiste.
+
+### 3. Instalar las dependencias del proyecto
+
+Dentro de la carpeta del proyecto (en la terminal), escribe:
 
 ```bash
 npm install
 ```
 
-Para generar el reporte HTML con evidencias (`npm run report`) se necesita además un **Java Runtime Environment (JRE)** instalado y disponible en el `PATH` (o vía la variable `JAVA_HOME`) — no hace falta para escribir ni correr las pruebas, solo para ese paso de reporte.
+Esto descarga todas las librerías que el proyecto necesita para funcionar. Puede tardar uno o dos minutos.
 
-## Comandos
+### 4. Instalar el navegador que usarán las pruebas
 
 ```bash
-npm run typecheck        # compila TypeScript sin emitir (tsc --noEmit)
-npm run lint              # revisa el código con ESLint
-npm run lint:fix          # aplica las correcciones automáticas de ESLint
-npx cucumber-js --dry-run  # valida que Cucumber carga escenarios y steps sin ejecutarlos
-npm test                 # ejecuta cucumber-js contra el sitio real
-npm run report            # genera el reporte HTML de Serenity BDD a partir de la última corrida
-npm run test:report       # corre las pruebas y genera el reporte en un solo paso
+npx playwright install chromium
 ```
 
-> `npm test` navega y envía formularios contra producción (registra un usuario real, entre
-> otras acciones). Ejecutar solo de forma intencional.
+Esto descarga una versión de Chromium (el navegador que usa Google Chrome) que Playwright controla automáticamente durante las pruebas. Es independiente del Chrome que ya tengas instalado.
 
-El reporte generado por `npm run report` queda en `target/site/serenity/index.html`.
+### 5. Ejecutar las pruebas
 
-## Estructura
-
-```
-features/
-├── *.feature                  # escenarios en Gherkin (español)
-├── step_definitions/          # steps de Cucumber
-└── support/
-    ├── actors.ts               # Cast de actores (Serenity/JS + Playwright)
-    ├── hooks.ts                # ciclo de vida del navegador, reporters y captura de pantalla en fallo
-    └── screenplay/
-        ├── ui/                 # locators (PageElement/By)
-        ├── tasks/               # Tasks del patrón Screenplay
-        └── questions/           # Questions del patrón Screenplay
+```bash
+npm test
 ```
 
-## Estado
+Esto abre un navegador de forma automática y ejecuta los escenarios de prueba contra el sitio real bon-bonite.com. Verás en la terminal, paso a paso, qué está haciendo cada prueba y si pasó o falló.
 
-- **Registro y edición de cuenta**: implementado y verificado contra el sitio real.
-- **Compra de producto**: implementado y verificado contra el sitio real; no se procesa pago real (se detiene en la verificación del carrito).
-- **PQRS**: steps pendientes (`Pendiente de implementar`); falta adjuntar evidencia real.
+> **Importante:** estas pruebas interactúan con el sitio real en producción — registran un usuario real y radican una PQRS real, entre otras acciones. No es un ambiente de pruebas aislado.
+
+### 6. Generar el reporte con evidencias (opcional)
+
+Este paso genera un reporte HTML navegable, con capturas de pantalla, mostrando el resultado de cada prueba paso a paso.
+
+Requiere tener instalado un **JRE (Java Runtime Environment)** — no todo Java, solo la parte necesaria para ejecutar programas ya compilados:
+
+1. Descarga un JRE gratuito, por ejemplo desde [adoptium.net](https://adoptium.net/) (elige la opción "JRE", no "JDK").
+2. Instálalo.
+3. En la terminal, confirma que quedó instalado:
+
+   ```bash
+   java -version
+   ```
+
+Con Java instalado, corre las pruebas y genera el reporte en un solo paso:
+
+```bash
+npm run test:report
+```
+
+O si ya corriste `npm test` antes y solo quieres generar el reporte de esa corrida:
+
+```bash
+npm run report
+```
+
+El reporte queda en el archivo `target/site/serenity/index.html` — ábrelo con doble clic para verlo en tu navegador.
+
+### Otros comandos disponibles
+
+```bash
+npm run typecheck   # Verifica que el código no tenga errores de tipos
+npm run lint         # Revisa el código con ESLint
+npm run lint:fix     # Corrige automáticamente lo que ESLint pueda arreglar solo
+```
