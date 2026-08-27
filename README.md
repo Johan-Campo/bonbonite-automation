@@ -2,6 +2,35 @@
 
 Automatización de pruebas end-to-end para el sitio [bon-bonite.com](https://www.bon-bonite.com/), usando el patrón **Screenplay** de Serenity/JS.
 
+## Sobre este proyecto
+
+Bon-bonite es una tienda de calzado, bolsos, cinturones y accesorios que puso en funcionamiento la primera versión de su sitio web. Este proyecto automatiza tres flujos críticos de esa primera versión, verificados contra el sitio real en producción:
+
+- **Registro y edición de cuenta**: un cliente se registra con datos únicos y luego modifica su nombre desde "Mi cuenta".
+- **Compra de producto**: un cliente navega un módulo del catálogo, selecciona un producto y una talla disponible, y lo agrega al carrito.
+- **Radicación de PQRS**: un cliente diligencia el formulario de peticiones, quejas y reclamos, adjunta una evidencia y confirma la recepción de su solicitud.
+
+Cada escenario está escrito en Gherkin (español) y se ejecuta con Cucumber.js orquestando actores de Serenity/JS, que a su vez controlan un navegador real vía Playwright — sin mocks ni ambiente de pruebas aislado: las pruebas interactúan con bon-bonite.com tal como lo haría un cliente real.
+
+## Estructura del proyecto
+
+```
+features/
+├── *.feature                          # Los 3 escenarios, escritos en Gherkin (español)
+├── step_definitions/                  # Conecta cada línea del .feature con el código que la ejecuta
+│   ├── registro.steps.ts
+│   ├── compra.steps.ts
+│   └── pqrs.steps.ts
+└── support/
+    ├── actors.ts                      # Configura el actor y la navegación (URL base, esperas)
+    ├── hooks.ts                       # Ciclo de vida: abre/cierra el navegador, reportes, captura en fallos
+    ├── fixtures/                      # Archivos de prueba (ej. evidencia para adjuntar en PQRS)
+    └── screenplay/                    # El patrón Screenplay de Serenity/JS
+        ├── ui/                        # Dónde están los elementos en cada página (selectores)
+        ├── tasks/                     # Qué hace el actor (ej. "Registrarse", "AgregarAlCarrito")
+        └── questions/                 # Qué puede consultar el actor (ej. el título de un producto)
+```
+
 ## Stack tecnológico
 
 | Herramienta | Para qué se usa |
