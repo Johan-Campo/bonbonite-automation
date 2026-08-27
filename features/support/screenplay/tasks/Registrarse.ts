@@ -18,7 +18,7 @@ export const datosDeRegistroUnicos = (): DatosDeRegistro => {
     nombres: 'Camila',
     apellidos: `Automatizada${marcaDeTiempo}`,
     correo: `camila.qa.${marcaDeTiempo}@bonbonite-automation.test`,
-    contrasena: 'ClaveSegura#2026',
+    contrasena: `Qa#${marcaDeTiempo}Segura`,
   };
 };
 
