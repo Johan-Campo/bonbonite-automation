@@ -1,21 +1,33 @@
 import { Given, Then, When } from '@cucumber/cucumber';
+import { Duration, Wait, actorInTheSpotlight, actorCalled } from '@serenity-js/core';
+import { Ensure, includes } from '@serenity-js/assertions';
+import { Click, Navigate, Page } from '@serenity-js/web';
 
-const pendienteDeImplementar = (paso: string): never => {
-  throw new Error(`Pendiente de implementar: ${paso}`);
-};
+import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
+import { DiligenciarFormularioPQRS, datosDePQRSUnicos } from '../support/screenplay/tasks/DiligenciarFormularioPQRS.js';
+import { PQRS } from '../support/screenplay/ui/pqrs.js';
 
-Given('que {word} visita el módulo "PQRS"', (_nombreActor: string) => {
-  pendienteDeImplementar('visitar el módulo "PQRS"');
+Given('que {word} visita el módulo "PQRS"', async (nombreActor: string) => {
+  await actorCalled(nombreActor).attemptsTo(Navigate.to('/pqrs/'), AceptarCookiesSiAparecen());
 });
 
-When('diligencia el formulario con sus datos de contacto y adjunta una evidencia', () => {
-  pendienteDeImplementar('diligenciar el formulario de PQRS y adjuntar una evidencia');
+When('diligencia el formulario con sus datos de contacto y adjunta una evidencia', async () => {
+  const datos = datosDePQRSUnicos();
+  await actorInTheSpotlight().attemptsTo(DiligenciarFormularioPQRS(datos));
 });
 
-When('lo envía', () => {
-  pendienteDeImplementar('enviar el formulario de PQRS');
+When('lo envía', async () => {
+  await actorInTheSpotlight().attemptsTo(
+    Click.on(PQRS.botonCrearPQRS),
+    Wait.upTo(Duration.ofSeconds(10)).until(
+      Page.current().url().pathname,
+      includes('/pqrs-radicada'),
+    ),
+  );
 });
 
-Then('el sistema confirma la recepción de la PQRS', () => {
-  pendienteDeImplementar('verificar la confirmación de recepción de la PQRS');
+Then('el sistema confirma la recepción de la PQRS', async () => {
+  await actorInTheSpotlight().attemptsTo(
+    Ensure.that(Page.current().url().pathname, includes('/pqrs-radicada')),
+  );
 });
