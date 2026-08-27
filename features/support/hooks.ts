@@ -22,7 +22,12 @@ BeforeAll(async () => {
     ],
   });
 
-  navegador = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
+  try {
+    navegador = await chromium.launch({ headless: process.env.HEADLESS !== 'false' });
+  } catch (error) {
+    console.error('No se pudo iniciar el navegador en BeforeAll:', error);
+    throw error;
+  }
 });
 
 Before(() => {
@@ -38,11 +43,18 @@ After(async function (escenario: ITestCaseHookParameter) {
     await actorInTheSpotlight().attemptsTo(
       TakeScreenshot.of(`Fallo en "${escenario.pickle.name}"`),
     );
-  } catch {
-    return;
+  } catch (error) {
+    console.error(
+      `No se pudo capturar la pantalla tras el fallo de "${escenario.pickle.name}":`,
+      error,
+    );
   }
 });
 
 AfterAll(async () => {
-  await navegador?.close();
+  try {
+    await navegador?.close();
+  } catch (error) {
+    console.error('No se pudo cerrar el navegador en AfterAll:', error);
+  }
 });
