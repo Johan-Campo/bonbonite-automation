@@ -1,14 +1,14 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { Duration, Wait, actorInTheSpotlight, actorCalled } from '@serenity-js/core';
 import { Ensure, includes } from '@serenity-js/assertions';
-import { Click, Navigate, Page } from '@serenity-js/web';
+import { Click, Page } from '@serenity-js/web';
 
-import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
 import { DiligenciarFormularioPQRS, datosDePQRSUnicos } from '../support/screenplay/tasks/DiligenciarFormularioPQRS.js';
+import { VisitarPagina } from '../support/screenplay/tasks/VisitarPagina.js';
 import { PQRS } from '../support/screenplay/ui/pqrs.js';
 
 Given('que {word} visita el módulo "PQRS"', async (nombreActor: string) => {
-  await actorCalled(nombreActor).attemptsTo(Navigate.to('/pqrs/'), AceptarCookiesSiAparecen());
+  await actorCalled(nombreActor).attemptsTo(VisitarPagina('/pqrs/'));
 });
 
 When('diligencia el formulario con sus datos de contacto y adjunta una evidencia', async () => {

@@ -1,7 +1,9 @@
-import { By, PageElement, PageElements } from '@serenity-js/web';
+import { By, PageElements } from '@serenity-js/web';
+
+import { Pagina } from './pagina.js';
 
 export const Carrito = {
-  contenido: PageElement.located(By.css('body')).describedAs('contenido de la página del carrito'),
+  contenido: Pagina.cuerpo,
 };
 
 export const ContadorDelCarrito = PageElements.located(By.css('a.cart-contents'))

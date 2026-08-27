@@ -1,14 +1,14 @@
-import { Given, Then, When } from '@cucumber/cucumber';
+import { Before, Given, Then, When } from '@cucumber/cucumber';
 import { actorCalled, actorInTheSpotlight } from '@serenity-js/core';
 import { Ensure, includes } from '@serenity-js/assertions';
-import { Navigate } from '@serenity-js/web';
 
+import { obtenerOFallar } from '../support/obtenerOFallar.js';
 import { ContenidoDelCarrito } from '../support/screenplay/questions/ContenidoDelCarrito.js';
 import { TituloDelProducto } from '../support/screenplay/questions/TituloDelProducto.js';
-import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
 import { AgregarAlCarrito } from '../support/screenplay/tasks/AgregarAlCarrito.js';
 import { ElegirTallaDisponible } from '../support/screenplay/tasks/ElegirTallaDisponible.js';
 import { SeleccionarPrimerProductoDelListado } from '../support/screenplay/tasks/SeleccionarPrimerProductoDelListado.js';
+import { VisitarPagina } from '../support/screenplay/tasks/VisitarPagina.js';
 
 const URL_MODULOS: Record<string, string> = {
   Zapatos: '/categoria-producto/zapatos-mujer/',
@@ -20,13 +20,17 @@ const URL_MODULOS: Record<string, string> = {
 
 const productoSeleccionadoPorActor = new Map<string, string>();
 
+Before(() => {
+  productoSeleccionadoPorActor.clear();
+});
+
 Given('que {word} navega al módulo {string}', async (nombreActor: string, modulo: string) => {
   const ruta = URL_MODULOS[modulo];
   if (!ruta) {
     throw new Error(`Módulo "${modulo}" no tiene una URL configurada en URL_MODULOS.`);
   }
 
-  await actorCalled(nombreActor).attemptsTo(Navigate.to(ruta), AceptarCookiesSiAparecen());
+  await actorCalled(nombreActor).attemptsTo(VisitarPagina(ruta));
 });
 
 When('selecciona el primer producto disponible del listado', async () => {
@@ -47,10 +51,11 @@ When('lo agrega al carrito', async () => {
 
 Then('el carrito refleja el producto agregado', async () => {
   const actor = actorInTheSpotlight();
-  const titulo = productoSeleccionadoPorActor.get(actor.name);
-  if (!titulo) {
-    throw new Error('No se capturó el título del producto seleccionado en un paso previo.');
-  }
+  const titulo = obtenerOFallar(
+    productoSeleccionadoPorActor,
+    actor.name,
+    'No se capturó el título del producto seleccionado en un paso previo.',
+  );
 
   await actor.attemptsTo(Ensure.that(ContenidoDelCarrito(), includes(titulo)));
 });

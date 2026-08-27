@@ -1,18 +1,25 @@
-import { Given, Then, When } from '@cucumber/cucumber';
+import { Before, Given, Then, When } from '@cucumber/cucumber';
 import { actorCalled, actorInTheSpotlight, Wait } from '@serenity-js/core';
 import { Ensure, includes } from '@serenity-js/assertions';
-import { By, Click, Enter, Navigate, Page, PageElement, Text, isVisible } from '@serenity-js/web';
+import { Click, Enter, Navigate, Page, Text, isVisible } from '@serenity-js/web';
 
-import { AceptarCookiesSiAparecen } from '../support/screenplay/tasks/AceptarCookiesSiAparecen.js';
+import { obtenerOFallar } from '../support/obtenerOFallar.js';
 import { MiCuenta } from '../support/screenplay/ui/miCuenta.js';
+import { Pagina } from '../support/screenplay/ui/pagina.js';
 import { Registrarse, datosDeRegistroUnicos } from '../support/screenplay/tasks/Registrarse.js';
+import { VisitarPagina } from '../support/screenplay/tasks/VisitarPagina.js';
 import type { DatosDeRegistro } from '../support/screenplay/tasks/Registrarse.js';
 
 const datosRegistradosPorActor = new Map<string, DatosDeRegistro>();
 const nuevoNombrePorActor = new Map<string, string>();
 
+Before(() => {
+  datosRegistradosPorActor.clear();
+  nuevoNombrePorActor.clear();
+});
+
 Given('que {word} visita la página de "Mi cuenta" de Bon-bonite', async (nombreActor: string) => {
-  await actorCalled(nombreActor).attemptsTo(Navigate.to('/mi-cuenta/'), AceptarCookiesSiAparecen());
+  await actorCalled(nombreActor).attemptsTo(VisitarPagina('/mi-cuenta/'));
 });
 
 When(
@@ -36,11 +43,7 @@ Given('que {word} ha iniciado sesión con una cuenta previamente registrada', as
   const datos = datosDeRegistroUnicos();
   datosRegistradosPorActor.set(nombreActor, datos);
 
-  await actorCalled(nombreActor).attemptsTo(
-    Navigate.to('/mi-cuenta/'),
-    AceptarCookiesSiAparecen(),
-    Registrarse(datos),
-  );
+  await actorCalled(nombreActor).attemptsTo(VisitarPagina('/mi-cuenta/'), Registrarse(datos));
 });
 
 When('actualiza su nombre desde "Mi cuenta"', async () => {
@@ -65,12 +68,11 @@ When('guarda los cambios', async () => {
 
 Then('el sistema confirma que los datos fueron actualizados correctamente', async () => {
   const actor = actorInTheSpotlight();
-  const nuevoNombre = nuevoNombrePorActor.get(actor.name);
-  if (!nuevoNombre) {
-    throw new Error('No se capturó el nuevo nombre en un paso previo.');
-  }
-
-  await actor.attemptsTo(
-    Ensure.that(Text.of(PageElement.located(By.css('body'))), includes(nuevoNombre)),
+  const nuevoNombre = obtenerOFallar(
+    nuevoNombrePorActor,
+    actor.name,
+    'No se capturó el nuevo nombre en un paso previo.',
   );
+
+  await actor.attemptsTo(Ensure.that(Text.of(Pagina.cuerpo), includes(nuevoNombre)));
 });
