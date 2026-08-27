@@ -5,7 +5,6 @@ const common = {
     'features/support/**/*.ts',
   ],
   format: ['@serenity-js/cucumber'],
-  formatOptions: { useSerenityJsReporters: true },
   paths: ['features/**/*.feature'],
   publishQuiet: true,
 };

@@ -6,7 +6,11 @@
   "type": "module",
   "scripts": {
     "test": "cucumber-js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "report": "serenity-bdd run",
+    "test:report": "npm test; npm run report"
   },
   "dependencies": {
     "@cucumber/cucumber": "^13.2.1",
@@ -19,8 +23,12 @@
     "playwright": "^1.62.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@serenity-js/serenity-bdd": "^3.45.9",
     "@types/node": "^26.3.0",
+    "eslint": "^10.9.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.68.0"
   }
 }
