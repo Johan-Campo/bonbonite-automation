@@ -1,16 +1,5 @@
 import { By, PageElement } from '@serenity-js/web';
 
-/**
- * Verificado contra el DOM real de /mi-cuenta/: ninguno de los campos de texto tiene
- * un <label for="..."> asociado correctamente, así que localizarlos por rol accesible
- * + nombre (como se había asumido originalmente) no funciona — todas las búsquedas
- * por rol devolvían 0 resultados. Los campos sí tienen IDs estables y semánticos
- * (parte del formulario estándar de registro/login de WooCommerce), así que se
- * localizan por ID.
- *
- * El toggle "¿Eres nuevo? Regístrate" tampoco es un <a> (no tiene rol de link): es un
- * <span id="show_register"> con un manejador de clic en JS.
- */
 export const MiCuenta = {
   enlaceRegistrate: PageElement.located(By.id('show_register')).describedAs(
     'enlace "¿Eres nuevo? Regístrate"',
@@ -53,15 +42,10 @@ export const MiCuenta = {
   },
 
   cuentaLogueada: {
-    // TODO: verificar selector real contra el sitio — no se completó un registro real
-    // todavía para inspeccionar el DOM de la cuenta ya logueada; se asume el marcador
-    // estándar de WooCommerce.
     enlaceCerrarSesion: PageElement.located(
       By.role('link', { name: 'Cerrar sesión', exact: false }),
     ).describedAs('enlace "Cerrar sesión"'),
-    // TODO: verificar selector real contra el sitio — DOM de "Mi cuenta" > "Editar datos
-    // de la cuenta" no fue inspeccionado.
-    campoNombre: PageElement.located(By.css('input[name="first_name" i]')).describedAs(
+    campoNombre: PageElement.located(By.id('first_name')).describedAs(
       'campo "Nombre" en edición de cuenta',
     ),
     botonGuardarCambios: PageElement.located(

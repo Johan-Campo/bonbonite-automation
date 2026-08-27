@@ -6,8 +6,6 @@ import { chromium, type Browser } from 'playwright';
 
 import { ActoresDelNavegador } from './actors.js';
 
-// El timeout por defecto de Cucumber (5s) no alcanza para navegar contra el sitio
-// real en producción (banner de envíos, imágenes, scripts de terceros como Yotpo).
 setDefaultTimeout(30_000);
 
 let navegador: Browser;
@@ -30,8 +28,7 @@ After(async function (escenario: ITestCaseHookParameter) {
       TakeScreenshot.of(`Fallo en "${escenario.pickle.name}"`),
     );
   } catch {
-    // no había un actor activo (fallo antes de interactuar con el navegador);
-    // no se oculta el fallo original del escenario por no poder tomar la captura.
+    return;
   }
 });
 

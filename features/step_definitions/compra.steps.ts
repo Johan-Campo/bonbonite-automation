@@ -10,8 +10,6 @@ import { AgregarAlCarrito } from '../support/screenplay/tasks/AgregarAlCarrito.j
 import { ElegirTallaDisponible } from '../support/screenplay/tasks/ElegirTallaDisponible.js';
 import { SeleccionarPrimerProductoDelListado } from '../support/screenplay/tasks/SeleccionarPrimerProductoDelListado.js';
 
-// URLs verificadas contra el sitio real; "Outlet" no lleva el sufijo "-mujer" que sí
-// llevan las demás categorías.
 const URL_MODULOS: Record<string, string> = {
   Zapatos: '/categoria-producto/zapatos-mujer/',
   Bolsos: '/categoria-producto/bolsos-mujer/',
@@ -20,8 +18,6 @@ const URL_MODULOS: Record<string, string> = {
   Outlet: '/categoria-producto/outlet/',
 };
 
-// Guarda, por nombre de actor, el título del producto seleccionado para poder
-// verificar después que el carrito realmente lo refleja.
 const productoSeleccionadoPorActor = new Map<string, string>();
 
 Given('que {word} navega al módulo {string}', async (nombreActor: string, modulo: string) => {

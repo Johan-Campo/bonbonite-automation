@@ -11,10 +11,6 @@ export interface DatosDeRegistro {
   contrasena: string;
 }
 
-/**
- * Genera datos de registro únicos por corrida a partir de un timestamp, para no chocar
- * con cuentas ya creadas en corridas anteriores contra el sitio real.
- */
 export const datosDeRegistroUnicos = (): DatosDeRegistro => {
   const marcaDeTiempo = Date.now();
   return {

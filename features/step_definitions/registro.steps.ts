@@ -9,8 +9,6 @@ import { MiCuenta } from '../support/screenplay/ui/miCuenta.js';
 import { Registrarse, datosDeRegistroUnicos } from '../support/screenplay/tasks/Registrarse.js';
 import type { DatosDeRegistro } from '../support/screenplay/tasks/Registrarse.js';
 
-// Guarda, por nombre de actor, los datos de registro generados en el escenario para
-// poder reutilizarlos en un paso posterior (ej. actualizar el nombre tras registrarse).
 const datosRegistradosPorActor = new Map<string, DatosDeRegistro>();
 
 Given('que {word} visita la página de "Mi cuenta" de Bon-bonite', async (nombreActor: string) => {
@@ -29,22 +27,12 @@ When(
 );
 
 Then('el sistema confirma que la cuenta fue creada exitosamente', async () => {
-  // Se verificó contra el sitio real que "Cerrar sesión" existe como enlace pero
-  // aparece duplicado (versión de escritorio y de menú móvil) y no siempre visible sin
-  // abrir un menú, lo que lo hace poco fiable para esta verificación. WooCommerce
-  // redirige a /mi-cuenta/orders/ e inicia sesión automáticamente tras un registro
-  // exitoso — es una señal más simple y ya confirmada.
   await actorInTheSpotlight().attemptsTo(
     Ensure.that(Page.current().url().pathname, includes('/mi-cuenta/orders')),
   );
 });
 
 Given('que {word} ha iniciado sesión con una cuenta previamente registrada', async (nombreActor: string) => {
-  // El sitio real no ofrece un mecanismo de fixtures/API para sembrar una cuenta de
-  // antemano, así que se registra una cuenta nueva y única en este mismo paso.
-  // WooCommerce autentica al cliente automáticamente tras un registro exitoso, lo que
-  // cumple el propósito de "cuenta previamente registrada e iniciada sesión" sin
-  // depender de credenciales fijas que podrían no existir en el ambiente de prueba.
   const datos = datosDeRegistroUnicos();
   datosRegistradosPorActor.set(nombreActor, datos);
 
@@ -61,9 +49,7 @@ When('actualiza su nombre desde "Mi cuenta"', async () => {
   const nuevoNombre = `${datosPrevios?.nombres ?? 'Camila'}Actualizada`;
 
   await actor.attemptsTo(
-    Navigate.to('/mi-cuenta/editar-cuenta/'),
-    // TODO: verificar selector real contra el sitio — ver comentario en miCuenta.ts
-    // sobre el campo "Nombre" del formulario de edición de cuenta.
+    Navigate.to('/mi-cuenta/edit-account/'),
     Enter.theValue(nuevoNombre).into(MiCuenta.cuentaLogueada.campoNombre),
   );
 });
