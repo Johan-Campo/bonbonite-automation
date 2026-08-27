@@ -3,3 +3,11 @@ node_modules/
 target/
 .serenity/
 *.tsbuildinfo
+.atl/
+.claude/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+diagnostico-*
